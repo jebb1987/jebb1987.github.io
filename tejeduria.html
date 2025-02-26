@@ -21,12 +21,13 @@
         h1 {
             color: #333;
             font-size: 22px;
+            margin-bottom: 20px;
         }
 
-        /* Estilos para la tabla */
+        /* Estilos para las tablas */
         table {
             width: 70%;
-            margin: auto;
+            margin: 20px auto;
             border-collapse: collapse;
             font-size: 16px;
             background-color: #fff;
@@ -99,9 +100,9 @@
 </head>
 <body>
 
-    <h1>Reporte de Tejeduría</h1>
+    <h1>Reporte de Tejeduría Diaria</h1>
 
-    <!-- Tabla de Producción -->
+    <!-- Tabla de Producción Diaria -->
     <table>
         <thead>
             <tr>
@@ -109,27 +110,50 @@
                 <th>Producción (Kg)</th>
             </tr>
         </thead>
-        <tbody id="tabla-datos"></tbody>
+        <tbody id="tabla-diaria"></tbody>
     </table>
 
-    <!-- Contenedor para el gráfico -->
+    <!-- Contenedor para el gráfico diario -->
     <div class="chart-container">
-        <canvas id="miGrafico"></canvas>
+        <canvas id="grafica-diaria"></canvas>
+    </div>
+
+    <!-- Sección de Reporte Mensual -->
+    <h1>Reporte de Tejeduría Mensual</h1>
+
+    <!-- Tabla de Producción Mensual -->
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producción (Kg)</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-mensual"></tbody>
+    </table>
+
+    <!-- Contenedor para el gráfico mensual -->
+    <div class="chart-container">
+        <canvas id="grafica-mensual"></canvas>
     </div>
 
     <!-- Botón para volver al menú principal -->
     <a href="index.html" class="btn-back">Volver al Menú Principal</a>
 
     <script>
-        // URL del archivo CSV en Google Sheets
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo9WSnZhzXw48Kz8uaKPnyOEqsVmtxuD6v5Budej19NS-k3rz1a6Iv_65yCmCWtA/pub?output=csv";
+        // URLs de las hojas de Google Sheets
+        const csvDiarioUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo9WSnZhzXw48Kz8uaKPnyOEqsVmtxuD6v5Budej19NS-k3rz1a6Iv_65yCmCWtA/pub?gid=233345468&single=true&output=csv";
+        const csvMensualUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo9WSnZhzXw48Kz8uaKPnyOEqsVmtxuD6v5Budej19NS-k3rz1a6Iv_65yCmCWtA/pub?gid=201119962&single=true&output=csv";
 
-        // Función para cargar datos desde el CSV
-        async function cargarDatos() {
+        // Función para cargar datos desde un CSV
+        async function cargarDatos(url, tablaId, graficoId, titulo) {
             try {
-                const response = await fetch(csvUrl);
+                const response = await fetch(url);
                 const data = await response.text();
+                console.log("Datos crudos del CSV:", data); // Depuración: Ver datos crudos
+
                 const filas = data.split("\n").slice(1); // Ignorar encabezado
+                console.log("Filas procesadas:", filas); // Depuración: Ver filas procesadas
 
                 let fechas = [];
                 let produccion = [];
@@ -137,12 +161,14 @@
 
                 filas.forEach(fila => {
                     let columnas = fila.split(",");
+                    console.log("Columnas procesadas:", columnas); // Depuración: Ver columnas procesadas
+
                     if (columnas.length >= 2) {
                         let fecha = columnas[0].trim();
                         let kg = parseFloat(columnas[1].replace(/"/g, '').trim().replace(",", ".")); // Reemplazar coma por punto para decimales
 
                         // Verificar que la fecha y el valor sean válidos
-                        if (!isNaN(kg) && fecha !== "Fecha") {
+                        if (!isNaN(kg)) {
                             fechas.push(fecha);
                             produccion.push(kg);
 
@@ -151,16 +177,18 @@
                     }
                 });
 
-                document.getElementById("tabla-datos").innerHTML = tablaHTML;
+                console.log("Datos finales:", { fechas, produccion }); // Depuración: Ver datos finales
+
+                document.getElementById(tablaId).innerHTML = tablaHTML;
 
                 // Crear gráfico con Chart.js
-                const ctx = document.getElementById('miGrafico').getContext('2d');
+                const ctx = document.getElementById(graficoId).getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: fechas,
                         datasets: [{
-                            label: 'Producción (Kg)',
+                            label: titulo,
                             data: produccion,
                             borderColor: '#008CBA', // Color azul para coincidir con el tema
                             borderWidth: 2,
@@ -188,8 +216,9 @@
             }
         }
 
-        // Cargar datos al iniciar la página
-        cargarDatos();
+        // Cargar datos diarios y mensuales al iniciar la página
+        cargarDatos(csvDiarioUrl, "tabla-diaria", "grafica-diaria", "Producción Diaria (Kg)");
+        cargarDatos(csvMensualUrl, "tabla-mensual", "grafica-mensual", "Producción Mensual (Kg)");
     </script>
 
 </body>

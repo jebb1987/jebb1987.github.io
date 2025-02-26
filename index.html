@@ -3,64 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Producción Mensual</title>
+    <title>Producción Mensual de la Hilandería</title>
+    
+    <!-- Incluir Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* Estilos para la tabla */
+        table {
+            width: 60%;
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 16px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Contenedor para centrar el gráfico */
+        .chart-container {
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding-top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 400px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Producción Mensual de la Hilandería</h2>
-    <table id="tablaDatos" class="display">
+
+    <h1>Producción Mensual de la Hilandería</h1>
+
+    <!-- Tabla de Producción -->
+    <table>
         <thead>
             <tr>
                 <th>Semana</th>
                 <th>Kg</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="tabla-datos"></tbody>
     </table>
-    <canvas id="grafico"></canvas>
+
+    <!-- Contenedor para el gráfico -->
+    <div class="chart-container">
+        <canvas id="miGrafico"></canvas>
+    </div>
 
     <script>
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjNM2jGW7ZO5_hCBeQxRZMoVYDtXw8k_jQJaRCrqTNhLKJpiwZk2Pt4S5lFp1F5w/pub?output=csv"; // Reemplázalo con el enlace CSV de Google Sheets
+        // URL del archivo CSV en Google Sheets (Pega aquí tu enlace)
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjNM2jGW7ZO5_hCBeQxRZMoVYDtXw8k_jQJaRCrqTNhLKJpiwZk2Pt4S5lFp1F5w/pub?output=csv"; // Reemplázalo con tu enlace de Google Sheets publicado en CSV
 
-        $(document).ready(function() {
-            fetch(SHEET_URL)
-                .then(response => response.text())
-                .then(csvText => {
-                    let rows = csvText.split("\n").slice(1); // Quitar encabezado
-                    let data = [];
-                    let labels = [];
-                    let tbody = "";
-                    
-                    rows.forEach(row => {
-                        let cols = row.split(",");
-                        if(cols.length >= 2) {
-                            labels.push(cols[0]);
-                            data.push(parseFloat(cols[1]));
-                            tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td></tr>`;
-                        }
-                    });
-                    
-                    $("#tablaDatos tbody").html(tbody);
-                    $("#tablaDatos").DataTable();
-                    
-                    new Chart(document.getElementById("grafico"), {
-                        type: "line",
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: "Producción (Kg)",
-                                data: data,
-                                borderColor: "blue",
-                                borderWidth: 2,
-                                fill: false
-                            }]
-                        }
-                    });
+        // Función para cargar datos desde el CSV
+        async function cargarDatos() {
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                const filas = data.split("\n").slice(1); // Ignorar encabezado
+
+                let semanas = [];
+                let kilos = [];
+                let tablaHTML = "";
+
+                filas.forEach(fila => {
+                    let columnas = fila.split(",");
+                    if (columnas.length >= 2) {
+                        let semana = columnas[0].trim();
+                        let kg = parseFloat(columnas[1].replace(/"/g, '').trim());
+
+                        semanas.push(semana);
+                        kilos.push(kg);
+
+                        tablaHTML += `<tr><td>${semana}</td><td>${kg.toLocaleString()}</td></tr>`;
+                    }
                 });
-        });
+
+                document.getElementById("tabla-datos").innerHTML = tablaHTML;
+
+                // Crear gráfico con Chart.js
+                const ctx = document.getElementById('miGrafico').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: semanas,
+                        datasets: [{
+                            label: 'Producción (Kg)',
+                            data: kilos,
+                            borderColor: 'blue',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error al cargar los datos:", error);
+            }
+        }
+
+        // Cargar datos al iniciar la página
+        cargarDatos();
     </script>
+
 </body>
 </html>

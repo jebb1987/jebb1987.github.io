@@ -87,7 +87,7 @@
         <thead>
             <tr>
                 <th>Mes</th>
-                <th>en Kg</th>
+                <th>Producción (Kg)</th>
             </tr>
         </thead>
         <tbody id="tabla-datos"></tbody>
@@ -99,8 +99,8 @@
     </div>
 
     <script>
-        // URL del archivo CSV en Google Sheets (Pega aquí tu enlace)
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjNM2jGW7ZO5_hCBeQxRZMoVYDtXw8k_jQJaRCrqTNhLKJpiwZk2Pt4S5lFp1F5w/pub?output=csv"; // Reemplázalo con tu enlace de Google Sheets publicado en CSV
+        // URL del archivo CSV en Google Sheets
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjNM2jGW7ZO5_hCBeQxRZMoVYDtXw8k_jQJaRCrqTNhLKJpiwZk2Pt4S5lFp1F5w/pub?output=csv";
 
         // Función para cargar datos desde el CSV
         async function cargarDatos() {
@@ -121,22 +121,29 @@
 
                         semanas.push(semana);
                         kilos.push(kg);
-
-                        tablaHTML += `<tr><td>${semana}</td><td>${kg.toLocaleString()}</td></tr>`;
                     }
                 });
 
+                // Invertir el orden de los datos para la tabla
+                semanas.reverse();
+                kilos.reverse();
+
+                // Generar el HTML de la tabla en orden inverso
+                for (let i = 0; i < semanas.length; i++) {
+                    tablaHTML += `<tr><td>${semanas[i]}</td><td>${kilos[i].toLocaleString()}</td></tr>`;
+                }
+
                 document.getElementById("tabla-datos").innerHTML = tablaHTML;
 
-                // Crear gráfico con Chart.js
+                // Crear gráfico con Chart.js (sin invertir el orden)
                 const ctx = document.getElementById('miGrafico').getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: semanas,
+                        labels: semanas.reverse(), // Volver a invertir para el gráfico
                         datasets: [{
                             label: 'Producción (Kg)',
-                            data: kilos,
+                            data: kilos.reverse(), // Volver a invertir para el gráfico
                             borderColor: 'blue',
                             borderWidth: 2,
                             fill: false
@@ -147,13 +154,6 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: { beginAtZero: true }
-                        },
-                        plugins: {
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false
-                            }
                         }
                     }
                 });

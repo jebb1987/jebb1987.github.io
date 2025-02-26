@@ -14,15 +14,18 @@
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f8f8f8;
+            margin: 0;
+            padding: 10px;
         }
 
         h1 {
             color: #333;
+            font-size: 22px;
         }
 
         /* Estilos para la tabla */
         table {
-            width: 30%;
+            width: 70%;
             margin: auto;
             border-collapse: collapse;
             font-size: 16px;
@@ -31,7 +34,7 @@
         }
 
         th, td {
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             border: 1px solid #ddd;
         }
@@ -41,17 +44,37 @@
             color: white;
         }
 
-        /* Contenedor para centrar el gráfico */
+        /* Contenedor del gráfico */
         .chart-container {
             width: 80%;
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
             padding-top: 20px;
         }
 
         canvas {
             max-width: 100%;
-            height: 400px;
+            min-height: 400px;
+        }
+
+        /* Ajustes para pantallas pequeñas */
+        @media (max-width: 768px) {
+            table {
+                width: 90%; /* Más ancho en celulares */
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+
+            .chart-container {
+                width: 95%; /* Hacerlo más grande */
+            }
+
+            canvas {
+                min-height: 350px; /* Asegurar que el gráfico no se vea aplastado */
+            }
         }
     </style>
 </head>

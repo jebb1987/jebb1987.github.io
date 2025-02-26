@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producción Mensual</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+</head>
+<body>
+    <h2>Producción Mensual de la Hilandería</h2>
+    <table id="tablaDatos" class="display">
+        <thead>
+            <tr>
+                <th>Semana</th>
+                <th>Kg</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <canvas id="grafico"></canvas>
+
+    <script>
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRjNM2jGW7ZO5_hCBeQxRZMoVYDtXw8k_jQJaRCrqTNhLKJpiwZk2Pt4S5lFp1F5w/pub?output=csv"; // Reemplázalo con el enlace CSV de Google Sheets
+
+        $(document).ready(function() {
+            fetch(SHEET_URL)
+                .then(response => response.text())
+                .then(csvText => {
+                    let rows = csvText.split("\n").slice(1); // Quitar encabezado
+                    let data = [];
+                    let labels = [];
+                    let tbody = "";
+                    
+                    rows.forEach(row => {
+                        let cols = row.split(",");
+                        if(cols.length >= 2) {
+                            labels.push(cols[0]);
+                            data.push(parseFloat(cols[1]));
+                            tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td></tr>`;
+                        }
+                    });
+                    
+                    $("#tablaDatos tbody").html(tbody);
+                    $("#tablaDatos").DataTable();
+                    
+                    new Chart(document.getElementById("grafico"), {
+                        type: "line",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "Producción (Kg)",
+                                data: data,
+                                borderColor: "blue",
+                                borderWidth: 2,
+                                fill: false
+                            }]
+                        }
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

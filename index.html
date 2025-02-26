@@ -147,6 +147,13 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: { beginAtZero: true }
+                        },
+                        plugins: {
+                            tooltip: {
+                                enabled: true,
+                                mode: 'index',
+                                intersect: false
+                            }
                         }
                     }
                 });

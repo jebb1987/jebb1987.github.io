@@ -73,7 +73,7 @@
 
     <script>
         // URL del archivo CSV publicado
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQq_4n3vDPC-6zFb5uCUxV5UWrV3x1siIvHpiQaD6bcvt0ZoLgIlWGMepH7mET-eA/pub?gid=814924934&single=true&output=csv";
+        const csvUrl = "https://docs.google.com/spreadsheets/d/1ym-WMD62LXlz0C0VTZmZN7Hzzk56Fdh7/export?format=csv";
 
         // Función para cargar y mostrar los datos del CSV
         async function loadTable() {
@@ -81,32 +81,29 @@
                 const response = await fetch(csvUrl);
                 const csvData = await response.text();
 
-                // Parsear el CSV a un array de objetos
-                const rows = csvData.split("\n");
-                const headers = rows[0].split(",");
-                const data = rows.slice(1).map(row => {
-                    const values = row.split(",");
-                    return headers.reduce((obj, header, index) => {
-                        obj[header.trim()] = values[index].trim();
-                        return obj;
-                    }, {});
-                });
+                // Parsear el CSV a un array de filas
+                const rows = csvData.split("\n").filter(row => row.trim() !== ""); // Eliminar filas vacías
 
                 // Crear la tabla HTML
                 let table = "<table>";
                 table += "<thead><tr>";
+
+                // Procesar la primera fila como encabezados
+                const headers = rows[0].split(",");
                 headers.forEach(header => {
-                    table += `<th>${header}</th>`;
+                    table += `<th>${header.trim()}</th>`;
                 });
                 table += "</tr></thead><tbody>";
 
-                data.forEach(row => {
+                // Procesar las filas de datos
+                for (let i = 1; i < rows.length; i++) {
+                    const values = rows[i].split(",");
                     table += "<tr>";
-                    headers.forEach(header => {
-                        table += `<td>${row[header]}</td>`;
+                    values.forEach(value => {
+                        table += `<td>${value.trim() === "" ? "-" : value.trim()}</td>`; // Mostrar "-" si la celda está vacía
                     });
                     table += "</tr>";
-                });
+                }
 
                 table += "</tbody></table>";
 
@@ -114,6 +111,7 @@
                 document.getElementById("table-container").innerHTML = table;
             } catch (error) {
                 console.error("Error al cargar los datos:", error);
+                document.getElementById("table-container").innerHTML = "<p>Error al cargar los datos. Por favor, inténtalo de nuevo más tarde.</p>";
             }
         }
 

@@ -19,27 +19,19 @@
             margin-bottom: 20px;
         }
 
-        table {
+        .iframe-container {
             width: 90%;
             max-width: 1000px;
             margin: 20px auto;
-            border-collapse: collapse;
+            height: 600px;
+            border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .btn-back {
@@ -65,58 +57,12 @@
 
     <h1>Reporte de Cardas</h1>
 
-    <div id="table-container">
-        <!-- Aquí se cargará la tabla dinámicamente -->
+    <div class="iframe-container">
+        <!-- Insertar el iframe con el rango específico -->
+        <iframe src="https://docs.google.com/spreadsheets/d/1ym-WMD62LXlz0C0VTZmZN7Hzzk56Fdh7/pubhtml?gid=0&single=true&range=B2:J2000"></iframe>
     </div>
 
     <a href="index.html" class="btn-back">Volver al Menú Principal</a>
 
-    <script>
-        // URL del archivo CSV publicado
-        const csvUrl = "https://docs.google.com/spreadsheets/d/1ym-WMD62LXlz0C0VTZmZN7Hzzk56Fdh7/export?format=csv";
-
-        // Función para cargar y mostrar los datos del CSV
-        async function loadTable() {
-            try {
-                const response = await fetch(csvUrl);
-                const csvData = await response.text();
-
-                // Parsear el CSV a un array de filas
-                const rows = csvData.split("\n").filter(row => row.trim() !== ""); // Eliminar filas vacías
-
-                // Crear la tabla HTML
-                let table = "<table>";
-                table += "<thead><tr>";
-
-                // Procesar la primera fila como encabezados
-                const headers = rows[0].split(",");
-                headers.forEach(header => {
-                    table += `<th>${header.trim()}</th>`;
-                });
-                table += "</tr></thead><tbody>";
-
-                // Procesar las filas de datos
-                for (let i = 1; i < rows.length; i++) {
-                    const values = rows[i].split(",");
-                    table += "<tr>";
-                    values.forEach(value => {
-                        table += `<td>${value.trim() === "" ? "-" : value.trim()}</td>`; // Mostrar "-" si la celda está vacía
-                    });
-                    table += "</tr>";
-                }
-
-                table += "</tbody></table>";
-
-                // Insertar la tabla en el contenedor
-                document.getElementById("table-container").innerHTML = table;
-            } catch (error) {
-                console.error("Error al cargar los datos:", error);
-                document.getElementById("table-container").innerHTML = "<p>Error al cargar los datos. Por favor, inténtalo de nuevo más tarde.</p>";
-            }
-        }
-
-        // Cargar la tabla al abrir la página
-        loadTable();
-    </script>
 </body>
 </html>

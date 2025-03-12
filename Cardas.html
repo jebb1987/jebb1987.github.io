@@ -26,7 +26,7 @@
             height: 600px;
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow: auto; /* Permitir desplazamiento si el contenido es grande */
+            overflow: auto;
         }
 
         iframe {
@@ -35,7 +35,7 @@
             border: none;
         }
 
-        .btn-back {
+        .btn-back, .btn-pdf {
             background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
@@ -49,7 +49,7 @@
             display: inline-block;
         }
 
-        .btn-back:hover {
+        .btn-back:hover, .btn-pdf:hover {
             background-color: #45a049;
         }
 
@@ -57,27 +57,26 @@
         @media (max-width: 768px) {
             .iframe-container {
                 width: 100%;
-                height: 400px; /* Reducir la altura en móviles */
+                height: 400px;
             }
 
             iframe {
-                transform: scale(0.8); /* Escalar el contenido al 80% */
-                transform-origin: 0 0; /* Asegurar que el escalado comience desde la esquina superior izquierda */
-                width: 125%; /* Compensar el escalado */
-                height: 125%; /* Compensar el escalado */
+                transform: scale(0.8);
+                transform-origin: 0 0;
+                width: 125%;
+                height: 125%;
             }
         }
 
-        /* Estilos para pantallas muy pequeñas (ej: smartphones pequeños) */
         @media (max-width: 480px) {
             .iframe-container {
-                height: 300px; /* Reducir aún más la altura */
+                height: 300px;
             }
 
             iframe {
-                transform: scale(0.7); /* Escalar el contenido al 70% */
-                width: 142.85%; /* Compensar el escalado */
-                height: 142.85%; /* Compensar el escalado */
+                transform: scale(0.7);
+                width: 142.85%;
+                height: 142.85%;
             }
         }
     </style>
@@ -91,7 +90,44 @@
         <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQq_4n3vDPC-6zFb5uCUxV5UWrV3x1siIvHpiQaD6bcvt0ZoLgIlWGMepH7mET-eA/pubhtml?gid=814924934&single=true"></iframe>
     </div>
 
+    <!-- Botón para descargar PDF -->
+    <button class="btn-pdf" onclick="descargarPDF()">Descargar PDF</button>
+
+    <!-- Botón para volver al menú principal -->
     <a href="index.html" class="btn-back">Volver al Menú Principal</a>
 
+    <!-- Incluir la biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Inicializar jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Función para descargar el PDF
+        function descargarPDF() {
+            // Obtener la fecha actual en formato YYYYMMDD
+            const fecha = new Date();
+            const año = fecha.getFullYear();
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+            const dia = String(fecha.getDate()).padStart(2, '0');
+            const fechaFormateada = `${año}${mes}${dia}`;
+
+            // Nombre del archivo PDF
+            const nombreArchivo = `Cardas${fechaFormateada}01.pdf`;
+
+            // Crear un nuevo documento PDF
+            const doc = new jsPDF();
+
+            // Capturar el contenido del iframe (o tabla) y agregarlo al PDF
+            const iframe = document.querySelector('iframe');
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            const contenido = iframeDocument.body.innerHTML;
+
+            // Agregar el contenido al PDF
+            doc.text(contenido, 10, 10); // Ajusta las coordenadas según sea necesario
+
+            // Descargar el PDF
+            doc.save(nombreArchivo);
+        }
+    </script>
 </body>
 </html>

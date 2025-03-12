@@ -96,12 +96,7 @@
     <!-- Botón para volver al menú principal -->
     <a href="index.html" class="btn-back">Volver al Menú Principal</a>
 
-    <!-- Incluir la biblioteca jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        // Inicializar jsPDF
-        const { jsPDF } = window.jspdf;
-
         // Función para descargar el PDF
         function descargarPDF() {
             // Obtener la fecha actual en formato YYYYMMDD
@@ -114,19 +109,15 @@
             // Nombre del archivo PDF
             const nombreArchivo = `Cardas${fechaFormateada}01.pdf`;
 
-            // Crear un nuevo documento PDF
-            const doc = new jsPDF();
+            // URL de exportación a PDF de Google Sheets
+            const sheetId = "2PACX-1vQq_4n3vDPC-6zFb5uCUxV5UWrV3x1siIvHpiQaD6bcvt0ZoLgIlWGMepH7mET-eA";
+            const pdfUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=pdf`;
 
-            // Capturar el contenido del iframe (o tabla) y agregarlo al PDF
-            const iframe = document.querySelector('iframe');
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            const contenido = iframeDocument.body.innerHTML;
-
-            // Agregar el contenido al PDF
-            doc.text(contenido, 10, 10); // Ajusta las coordenadas según sea necesario
-
-            // Descargar el PDF
-            doc.save(nombreArchivo);
+            // Crear un enlace temporal para descargar el PDF
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = nombreArchivo;
+            link.click();
         }
     </script>
 </body>
